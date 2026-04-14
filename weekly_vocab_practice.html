@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Weekly Vocab Practice — Workplace English</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --coral: #E8503A;
+    --coral-d: #C43E2A;
+    --coral-light: #FDF0EE;
+    --coral-mid: #F4C4BB;
+    --ink: #131313;
+    --ink-mid: #3A3A3A;
+    --muted: #888;
+    --bg: #F6F5F2;
+    --white: #FFFFFF;
+    --border: #E2E0DA;
+
+    --mon: #4A3A9E;  --mon-l: #EEEAF8;
+    --tue: #1A6B55;  --tue-l: #E2F3EF;
+    --wed: #8C5F1A;  --wed-l: #FDF3E3;
+    --thu: #185FA5;  --thu-l: #E6F1FB;
+    --fri: #B8285A;  --fri-l: #FCEAF1;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+  }
+
+  /* ─── NAV ─── */
+  .nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--white);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    padding: 0 32px;
+    gap: 4px;
+    overflow-x: auto;
+  }
+  .nav-logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 14px;
+    color: var(--coral);
+    margin-right: 20px;
+    white-space: nowrap;
+    padding: 16px 0;
+  }
+  .day-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 10px 18px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .day-btn .d-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+    transition: color 0.15s;
+  }
+  .day-btn .d-type {
+    font-size: 10px;
+    color: var(--muted);
+    transition: color 0.15s;
+  }
+  .day-btn.active-mon { border-bottom-color: var(--mon); }
+  .day-btn.active-mon .d-name { color: var(--mon); }
+  .day-btn.active-tue { border-bottom-color: var(--tue); }
+  .day-btn.active-tue .d-name { color: var(--tue); }
+  .day-btn.active-wed { border-bottom-color: var(--wed); }
+  .day-btn.active-wed .d-name { color: var(--wed); }
+  .day-btn.active-thu { border-bottom-color: var(--thu); }
+  .day-btn.active-thu .d-name { color: var(--thu); }
+  .day-btn.active-fri { border-bottom-color: var(--fri); }
+  .day-btn.active-fri .d-name { color: var(--fri); }
+
+  /* ─── DAY PANELS ─── */
+  .day-panel { display: none; }
+  .day-panel.active { display: block; }
+
+  /* ─── HERO ─── */
+  .hero {
+    padding: 48px 40px 36px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+  .hero-left {}
+  .hero-tag {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .hero h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: 38px;
+    font-weight: 800;
+    line-height: 1.05;
+    max-width: 500px;
+  }
+  .hero-desc {
+    font-size: 14px;
+    color: var(--ink-mid);
+    line-height: 1.6;
+    max-width: 460px;
+    margin-top: 12px;
+  }
+  .hero-badge {
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 10px 20px;
+    border-radius: 100px;
+    white-space: nowrap;
+  }
+
+  /* ─── VOCAB STRIP ─── */
+  .vocab-strip {
+    margin: 0 40px 32px;
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+  .vocab-strip-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 20px;
+    cursor: pointer;
+    background: var(--white);
+    user-select: none;
+  }
+  .vocab-strip-header span {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .vocab-strip-header .toggle-icon {
+    font-size: 18px;
+    color: var(--muted);
+    transition: transform 0.2s;
+  }
+  .vocab-strip-body {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 1px;
+    background: var(--border);
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.35s ease;
+  }
+  .vocab-strip-body.open { max-height: 800px; }
+  .vocab-item {
+    background: var(--white);
+    padding: 14px 16px;
+  }
+  .vocab-term {
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 3px;
+  }
+  .vocab-def {
+    font-size: 12px;
+    color: var(--ink-mid);
+    line-height: 1.45;
+  }
+  .vocab-ex {
+    font-size: 11px;
+    color: var(--muted);
+    font-style: italic;
+    margin-top: 4px;
+    line-height: 1.4;
+  }
+
+  /* ─── CONTENT AREA ─── */
+  .content {
+    padding: 0 40px 60px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  /* ─── CARD ─── */
+  .card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+  }
+  .card-header {
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+  }
+  .card-icon {
+    font-size: 22px;
+    min-width: 28px;
+    padding-top: 2px;
+  }
+  .card-meta { flex: 1; }
+  .card-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+  }
+  .card-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1.2;
+    margin-bottom: 5px;
+  }
+  .card-desc {
+    font-size: 13px;
+    color: var(--ink-mid);
+    line-height: 1.6;
+  }
+  .card-body {
+    padding: 20px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  /* ─── ITEMS ─── */
+  .item-list { display: flex; flex-direction: column; gap: 8px; }
+  .item {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    padding: 11px 14px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-size: 13.5px;
+    color: var(--ink-mid);
+    line-height: 1.55;
+    transition: background 0.15s, border-color 0.15s;
+    cursor: default;
+  }
+  .item-n {
+    font-size: 11px;
+    font-weight: 700;
+    min-width: 18px;
+    padding-top: 2px;
+  }
+
+  /* ─── EXAMPLE ─── */
+  .example {
+    border-radius: 0 10px 10px 0;
+    padding: 13px 16px;
+  }
+  .example-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 7px;
+  }
+  .example p {
+    font-size: 13px;
+    line-height: 1.6;
+    margin-bottom: 3px;
+    color: var(--ink-mid);
+  }
+  .example p:last-child { margin-bottom: 0; }
+  .example p strong { color: var(--ink); font-weight: 600; }
+
+  /* ─── TIP ─── */
+  .tip {
+    background: #FDF3E3;
+    border-radius: 10px;
+    padding: 11px 15px;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .tip p { font-size: 13px; color: #7A4F10; line-height: 1.5; }
+
+  /* ─── RULE ─── */
+  .rule {
+    background: #FDE8E5;
+    border-radius: 10px;
+    padding: 11px 15px;
+  }
+  .rule p { font-size: 13px; color: #A02020; font-weight: 500; line-height: 1.5; }
+
+  /* ─── TIMED ─── */
+  .timed-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 5px 14px;
+    border-radius: 100px;
+    background: #FDE8E5;
+    color: #A02020;
+  }
+  .blink {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: #A02020;
+    animation: blink 1.2s ease-in-out infinite;
+  }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+
+  /* ─── GRID 2 ─── */
+  .grid2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .mini-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 14px;
+  }
+  .mini-card .mc-top {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 6px;
+  }
+  .mini-card p {
+    font-size: 13px;
+    color: var(--ink-mid);
+    line-height: 1.5;
+  }
+  .mini-card .mc-task {
+    font-size: 11px;
+    color: var(--blue-text, #185FA5);
+    margin-top: 7px;
+    font-style: italic;
+    line-height: 1.4;
+  }
+
+  /* ─── RESPONSIVE ─── */
+  @media(max-width:640px){
+    .hero { padding: 28px 20px 24px; }
+    .hero h2 { font-size: 26px; }
+    .vocab-strip { margin: 0 20px 24px; }
+    .content { padding: 0 20px 40px; }
+    .card-header, .card-body { padding: 16px 18px; }
+    .grid2 { grid-template-columns: 1fr; }
+    .nav { padding: 0 16px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-logo">WorkVocab</div>
+  <button class="day-btn active-mon" onclick="showDay('mon',this)" id="btn-mon">
+    <span class="d-name">Monday</span>
+    <span class="d-type">Vocabulary in context</span>
+  </button>
+  <button class="day-btn" onclick="showDay('tue',this)" id="btn-tue">
+    <span class="d-name">Tuesday</span>
+    <span class="d-type">Sentence builder</span>
+  </button>
+  <button class="day-btn" onclick="showDay('wed',this)" id="btn-wed">
+    <span class="d-name">Wednesday</span>
+    <span class="d-type">Storytelling</span>
+  </button>
+  <button class="day-btn" onclick="showDay('thu',this)" id="btn-thu">
+    <span class="d-name">Thursday</span>
+    <span class="d-type">Opinion hot takes</span>
+  </button>
+  <button class="day-btn" onclick="showDay('fri',this)" id="btn-fri">
+    <span class="d-name">Friday</span>
+    <span class="d-type">Fluency sprint</span>
+  </button>
+</nav>
+
+<!-- ══════════ MONDAY ══════════ -->
+<div class="day-panel active" id="panel-mon">
+  <div class="hero">
+    <div class="hero-left">
+      <p class="hero-tag" style="color:var(--mon)">Monday · Exercise type 1</p>
+      <h2 style="color:var(--mon)">Vocabulary<br>in context</h2>
+      <p class="hero-desc">Each day starts with a new set of phrasal verbs and idioms. Today: learn the words through real workplace situations — read, absorb, then speak.</p>
+    </div>
+    <span class="hero-badge" style="background:var(--mon-l);color:var(--mon)">🔍 Read & react</span>
+  </div>
+
+  <!-- VOCAB STRIP -->
+  <div class="vocab-strip" style="--strip-color:var(--mon)">
+    <div class="vocab-strip-header" onclick="toggleVocab(this)">
+      <span>This week's vocabulary — click to expand</span>
+      <span class="toggle-icon">+</span>
+    </div>
+    <div class="vocab-strip-body">
+      <div class="vocab-item"><p class="vocab-term" style="color:var(--coral)">get under your skin</p><p class="vocab-def">irritate or upset someone</p><p class="vocab-ex">"His constant lateness really gets under my skin."</p></div>
+      <div class="vocab-item"><p class="vocab-term" style="color:var(--coral)">cross the divide</p><p class="vocab-def">build understanding with someone very different from you</p><p class="vocab-ex">"She managed to cross the divide with her difficult client."</p></div>
+      <div class="vocab-item"><p class="vocab-term" style="color:var(--coral)">coping mechanisms</p><p class="vocab-def">strategies to manage stress or difficult situations</p><p class="vocab-ex">"Exercise is one of my main coping mechanisms."</p></div>
+      <div class="vocab-item"><p class="vocab-term" style="color:var(--coral)">in the same boat</p><p class="vocab-def">facing the same difficult situation as others</p><p class="vocab-ex">"We're all in the same boat — too much work, too little time."</p></div>
+      <div class="vocab-item"><p class="vocab-term" style="color:var(--coral)">build rapport</p><p class="vocab-def">develop trust and connection with someone</p><p class="vocab-ex">"Good managers always build rapport with their teams."</p></div>
+      <div class="vocab-item"><p class="vocab-term" style="color:var(--coral)">put off</p><p class="vocab-def">postpone; avoid doing something</p><p class="vocab-ex">"Stop putting off that difficult conversation."</p></div>
+      <div class="vocab-item"><p class="vocab-term" style="color:var(--coral)">give off</p><p class="vocab-def">emit a feeling, vibe or impression</p><p class="vocab-ex">"She gives off a very confident energy in meetings."</p></div>
+      <div class="vocab-item"><p class="vocab-term" style="color:var(--coral)">freeze out</p><p class="vocab-def">exclude someone from a group or conversation</p><p class="vocab-ex">"I felt completely frozen out by the new team."</p></div>
+      <div class="vocab-item"><p class="vocab-term" style="color:var(--coral)">point out</p><p class="vocab-def">draw attention to something; highlight</p><p class="vocab-ex">"She pointed out a major error in the report."</p></div>
+      <div class="vocab-item"><p class="vocab-term" style="color:var(--coral)">take on</p><p class="vocab-def">accept or start a new responsibility or challenge</p><p class="vocab-ex">"Are you ready to take on a new client?"</p></div>
+      <div class="vocab-item"><p class="vocab-term" style="color:var(--coral)">carry out</p><p class="vocab-def">perform or complete a task</p><p class="vocab-ex">"She carried out the research before the meeting."</p></div>
+      <div class="vocab-item"><p class="vocab-term" style="color:var(--coral)">get on with</p><p class="vocab-def">have a good relationship with someone</p><p class="vocab-ex">"I really get on with my new manager."</p></div>
+      <div class="vocab-item"><p class="vocab-term" style="color:var(--coral)">call off</p><p class="vocab-def">cancel something that was planned</p><p class="vocab-ex">"They called off the meeting at the last minute."</p></div>
+      <div class="vocab-item"><p class="vocab-term" style="color:var(--coral)">stick to</p><p class="vocab-def">follow a plan, rule or schedule without changing</p><p class="vocab-ex">"She always sticks to deadlines."</p></div>
+      <div class="vocab-item"><p class="vocab-term" style="color:var(--coral)">speak up</p><p class="vocab-def">say what you think, especially in a group</p><p class="vocab-ex">"You need to speak up in these meetings."</p></div>
+      <div class="vocab-item"><p class="vocab-term" style="color:var(--coral)">step up</p><p class="vocab-def">take more responsibility; rise to the occasion</p><p class="vocab-ex">"When the manager left, she stepped up beautifully."</p></div>
+      <div class="vocab-item"><p class="vocab-term" style="color:var(--coral)">back down</p><p class="vocab-def">withdraw from a position or argument</p><p class="vocab-ex">"He never backs down in negotiations."</p></div>
+      <div class="vocab-item"><p class="vocab-term" style="color:var(--coral)">follow up</p><p class="vocab-def">check on progress after a meeting or conversation</p><p class="vocab-ex">"I'll follow up with them by Friday."</p></div>
+      <div class="vocab-item"><p class="vocab-term" style="color:var(--coral)">burn out</p><p class="vocab-def">become exhausted from too much work or stress</p><p class="vocab-ex">"She completely burned out after the product launch."</p></div>
+      <div class="vocab-item"><p class="vocab-term" style="color:var(--coral)">check in with</p><p class="vocab-def">contact someone briefly to see how they are or how things are going</p><p class="vocab-ex">"I check in with my team every Monday morning."</p></div>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon">🗂️</div>
+        <div class="card-meta">
+          <p class="card-label" style="color:var(--mon)">Exercise 1A — Situational reading</p>
+          <h3 class="card-title">What's really happening here?</h3>
+          <p class="card-desc">Read each mini-situation. Identify which vocabulary word or phrasal verb best describes what's happening — say it out loud and explain your reasoning in one sentence.</p>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="item-list">
+          <div class="item" style="border-left:3px solid var(--mon)"><span class="item-n" style="color:var(--mon)">A</span>Your colleague João was supposed to send you the report on Tuesday. It's now Friday and he still hasn't sent it. Every time you bring it up, he says "I'll do it tomorrow."</div>
+          <div class="item" style="border-left:3px solid var(--mon)"><span class="item-n" style="color:var(--mon)">B</span>In every team meeting, whenever Ana speaks, the other two colleagues start side conversations and look at their phones. Ana has noticed she's never included in the group chat either.</div>
+          <div class="item" style="border-left:3px solid var(--mon)"><span class="item-n" style="color:var(--mon)">C</span>Ricardo walks into every client call with a calm, open posture. He remembers people's names, asks follow-up questions, and clients always leave feeling understood.</div>
+          <div class="item" style="border-left:3px solid var(--mon)"><span class="item-n" style="color:var(--mon)">D</span>The whole team is overwhelmed. Three deadlines are due on the same day. Everyone is stressed — not just you.</div>
+          <div class="item" style="border-left:3px solid var(--mon)"><span class="item-n" style="color:var(--mon)">E</span>Carla has been working 14-hour days for three months straight. She's started making mistakes, sleeping badly, and losing motivation for everything.</div>
+          <div class="item" style="border-left:3px solid var(--mon)"><span class="item-n" style="color:var(--mon)">F</span>After the project meeting, Marcos sent a quick message to each team member to check how they were doing with their tasks and if they needed anything.</div>
+        </div>
+        <div class="example" style="background:#EEE9FB;border-left:3px solid var(--mon)">
+          <p class="example-label" style="color:var(--mon)">Example answer</p>
+          <p><strong>Situation A</strong> → "João is definitely putting off the report. He keeps postponing it and giving off a vibe that he doesn't want to deal with the problem."</p>
+        </div>
+        <div class="tip"><span>💡</span><p>Challenge: after identifying the word, add one more sentence using a second vocabulary item. E.g. "…and this really gets under my skin."</p></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon">🎯</div>
+        <div class="card-meta">
+          <p class="card-label" style="color:var(--mon)">Exercise 1B — Personalisation</p>
+          <h3 class="card-title">Does this happen to you?</h3>
+          <p class="card-desc">For each item below, say whether this is something you do, have experienced, or have witnessed — at work or in your personal life as an entrepreneur or teacher. Use the exact vocabulary phrase in your answer.</p>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="item-list">
+          <div class="item"><span class="item-n" style="color:var(--mon)">1</span>Putting off difficult conversations with clients or students.</div>
+          <div class="item"><span class="item-n" style="color:var(--mon)">2</span>Feeling frozen out in a professional group or community.</div>
+          <div class="item"><span class="item-n" style="color:var(--mon)">3</span>The pressure of taking on too many projects at once.</div>
+          <div class="item"><span class="item-n" style="color:var(--mon)">4</span>Someone or something that regularly gets under your skin.</div>
+          <div class="item"><span class="item-n" style="color:var(--mon)">5</span>How you check in with your students or clients after a session.</div>
+        </div>
+        <div class="tip"><span>🔥</span><p>Try to speak for at least 30 seconds on each item. If you run out of ideas, your teacher will ask: "Can you give a specific example?"</p></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ TUESDAY ══════════ -->
+<div class="day-panel" id="panel-tue">
+  <div class="hero">
+    <div class="hero-left">
+      <p class="hero-tag" style="color:var(--tue)">Tuesday · Exercise type 2</p>
+      <h2 style="color:var(--tue)">Sentence<br>builder</h2>
+      <p class="hero-desc">Today you practise constructing sentences — transforming, completing and paraphrasing using the week's vocabulary. The goal is accuracy inside real workplace sentences.</p>
+    </div>
+    <span class="hero-badge" style="background:var(--tue-l);color:var(--tue)">✍️ Build & transform</span>
+  </div>
+
+  <div class="vocab-strip">
+    <div class="vocab-strip-header" onclick="toggleVocab(this)">
+      <span>Vocabulary reference — click to expand</span>
+      <span class="toggle-icon">+</span>
+    </div>
+    <div class="vocab-strip-body">
+      <div class="vocab-item"><p class="vocab-term" style="color:var(--coral)">speak up</p><p class="vocab-def">say what you think in a group setting</p></div>
+      <div class="vocab-item"><p class="vocab-term" style="color:var(--coral)">step up</p><p class="vocab-def">take more responsibility or rise to the occasion</p></div>
+      <div class="vocab-item"><p class="vocab-term" style="color:var(--coral)">back down</p><p class="vocab-def">withdraw from a position or argument</p></div>
+      <div class="vocab-item"><p class="vocab-term" style="color:var(--coral)">follow up</p><p class="vocab-def">check on progress after a conversation</p></div>
+      <div class="vocab-item"><p class="vocab-term" style="color:var(--coral)">burn out</p><p class="vocab-def">become exhausted from too much work</p></div>
+      <div class="vocab-item"><p class="vocab-term" style="color:var(--coral)">get on with</p><p class="vocab-def">have a good relationship with someone</p></div>
+      <div class="vocab-item"><p class="vocab-term" style="color:var(--coral)">check in with</p><p class="vocab-def">contact briefly to see how things are going</p></div>
+      <div class="vocab-item"><p class="vocab-term" style="color:var(--coral)">build rapport</p><p class="vocab-def">develop trust and connection with someone</p></div>
+      <div class="vocab-item"><p class="vocab-term" style="color:var(--coral)">coping mechanisms</p><p class="vocab-def">strategies to manage stress</p></div>
+      <div class="vocab-item"><p class="vocab-term" style="color:var(--coral)">in the same boat</p><p class="vocab-def">in the same difficult situation</p></div>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon">🔄</div>
+        <div class="card-meta">
+          <p class="card-label" style="color:var(--tue)">Exercise 2A — Paraphrase challenge</p>
+          <h3 class="card-title">Say it differently</h3>
+          <p class="card-desc">Rewrite each sentence using the phrasal verb or idiom in brackets. Say your new sentence out loud — the meaning must stay the same.</p>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="item-list">
+          <div class="item" style="border-left:3px solid var(--tue)"><span class="item-n" style="color:var(--tue)">1</span>"I've been avoiding sending that invoice for two weeks." → use <strong>put off</strong></div>
+          <div class="item" style="border-left:3px solid var(--tue)"><span class="item-n" style="color:var(--tue)">2</span>"My new student seems cold but actually she's just shy." → use <strong>give off</strong></div>
+          <div class="item" style="border-left:3px solid var(--tue)"><span class="item-n" style="color:var(--tue)">3</span>"After the class I always send a quick message to see how they're doing." → use <strong>check in with</strong></div>
+          <div class="item" style="border-left:3px solid var(--tue)"><span class="item-n" style="color:var(--tue)">4</span>"When my manager left, I had to start leading the team." → use <strong>step up</strong></div>
+          <div class="item" style="border-left:3px solid var(--tue)"><span class="item-n" style="color:var(--tue)">5</span>"All freelancers deal with the same problem: irregular income." → use <strong>in the same boat</strong></div>
+          <div class="item" style="border-left:3px solid var(--tue)"><span class="item-n" style="color:var(--tue)">6</span>"She never says what she thinks in team discussions." → use <strong>speak up</strong></div>
+          <div class="item" style="border-left:3px solid var(--tue)"><span class="item-n" style="color:var(--tue)">7</span>"After six months without a break, he completely exhausted himself." → use <strong>burn out</strong></div>
+        </div>
+        <div class="example" style="background:#DFF2EB;border-left:3px solid var(--tue)">
+          <p class="example-label" style="color:var(--tue)">Example</p>
+          <p><strong>Original:</strong> "I've been avoiding sending that invoice for two weeks."</p>
+          <p><strong>Transformed:</strong> "I've been putting off sending that invoice for two weeks."</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon">🧩</div>
+        <div class="card-meta">
+          <p class="card-label" style="color:var(--tue)">Exercise 2B — Complete & extend</p>
+          <h3 class="card-title">Finish and keep going</h3>
+          <p class="card-desc">Complete each sentence starter with a vocabulary word, then keep talking for 20 more seconds — add context, a reason, or a personal example.</p>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="item-list">
+          <div class="item" style="border-left:3px solid var(--tue)"><span class="item-n" style="color:var(--tue)">A</span>"One thing that really gets under my skin at work is when people…"</div>
+          <div class="item" style="border-left:3px solid var(--tue)"><span class="item-n" style="color:var(--tue)">B</span>"As an entrepreneur, I had to step up when…"</div>
+          <div class="item" style="border-left:3px solid var(--tue)"><span class="item-n" style="color:var(--tue)">C</span>"I find it hard to speak up when…"</div>
+          <div class="item" style="border-left:3px solid var(--tue)"><span class="item-n" style="color:var(--tue)">D</span>"My main coping mechanism when I feel overwhelmed is…"</div>
+          <div class="item" style="border-left:3px solid var(--tue)"><span class="item-n" style="color:var(--tue)">E</span>"To build rapport with a new student, I usually…"</div>
+          <div class="item" style="border-left:3px solid var(--tue)"><span class="item-n" style="color:var(--tue)">F</span>"The last time I had to follow up with someone was when…"</div>
+        </div>
+        <div class="tip"><span>💡</span><p>Don't stop at the vocabulary word. The real practice is what comes after — your ideas, your story, your English.</p></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ WEDNESDAY ══════════ -->
+<div class="day-panel" id="panel-wed">
+  <div class="hero">
+    <div class="hero-left">
+      <p class="hero-tag" style="color:var(--wed)">Wednesday · Exercise type 3</p>
+      <h2 style="color:var(--wed)">Storytelling<br>in English</h2>
+      <p class="hero-desc">Midweek is for longer speech. You'll tell real or imagined stories using the vocabulary — the goal is fluency over accuracy. Keep talking.</p>
+    </div>
+    <span class="hero-badge" style="background:var(--wed-l);color:var(--wed)">🎙️ Talk for 60 sec</span>
+  </div>
+
+  <div class="vocab-strip">
+    <div class="vocab-strip-header" onclick="toggleVocab(this)">
+      <span>Vocabulary reference — click to expand</span>
+      <span class="toggle-icon">+</span>
+    </div>
+    <div class="vocab-strip-body">
+      <div class="vocab-item"><p class="vocab-term" style="color:var(--coral)">cross the divide</p><p class="vocab-def">build understanding with someone very different</p></div>
+      <div class="vocab-item"><p class="vocab-term" style="color:var(--coral)">freeze out</p><p class="vocab-def">exclude someone deliberately</p></div>
+      <div class="vocab-item"><p class="vocab-term" style="color:var(--coral)">point out</p><p class="vocab-def">highlight or draw attention to something</p></div>
+      <div class="vocab-item"><p class="vocab-term" style="color:var(--coral)">back down</p><p class="vocab-def">withdraw from a position</p></div>
+      <div class="vocab-item"><p class="vocab-term" style="color:var(--coral)">carry out</p><p class="vocab-def">execute or complete a task</p></div>
+      <div class="vocab-item"><p class="vocab-term" style="color:var(--coral)">call off</p><p class="vocab-def">cancel something planned</p></div>
+      <div class="vocab-item"><p class="vocab-term" style="color:var(--coral)">get on with</p><p class="vocab-def">have a good relationship with</p></div>
+      <div class="vocab-item"><p class="vocab-term" style="color:var(--coral)">take on</p><p class="vocab-def">accept a new challenge or responsibility</p></div>
+      <div class="vocab-item"><p class="vocab-term" style="color:var(--coral)">build rapport</p><p class="vocab-def">develop trust and friendship</p></div>
+      <div class="vocab-item"><p class="vocab-term" style="color:var(--coral)">stick to</p><p class="vocab-def">follow a plan without deviating</p></div>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon">📖</div>
+        <div class="card-meta">
+          <p class="card-label" style="color:var(--wed)">Exercise 3A — Story prompts</p>
+          <h3 class="card-title">Tell me a story</h3>
+          <p class="card-desc">Choose one prompt. Speak for 60–90 seconds. Your story can be real or invented. You must use at least 3 vocabulary items naturally — not forced at the end, but woven into the story.</p>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="item-list">
+          <div class="item" style="border-left:3px solid var(--wed)"><span class="item-n" style="color:var(--wed)">1</span>Tell me about a time you had to take on something that felt way too big for you. What happened? Did you stick to the plan or change it along the way?</div>
+          <div class="item" style="border-left:3px solid var(--wed)"><span class="item-n" style="color:var(--wed)">2</span>Describe a professional relationship where you really struggled to build rapport — with a student, client, or collaborator. What did you try? Did it work?</div>
+          <div class="item" style="border-left:3px solid var(--wed)"><span class="item-n" style="color:var(--wed)">3</span>Talk about a situation where you had to point out a problem or mistake — to a student, client or colleague. How did you do it? Did the person back down?</div>
+          <div class="item" style="border-left:3px solid var(--wed)"><span class="item-n" style="color:var(--wed)">4</span>Describe a project or task you had to call off or put aside. What got in the way? How did you feel about it?</div>
+          <div class="item" style="border-left:3px solid var(--wed)"><span class="item-n" style="color:var(--wed)">5</span>Tell me about a moment in your music or teaching career where you had to cross the divide — connect with someone who saw things completely differently.</div>
+        </div>
+        <div class="tip"><span>🎯</span><p>Required: say at least 3 vocabulary words. Suggested: "I had to…", "The situation was…", "What I did was…", "Looking back…"</p></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon">🔗</div>
+        <div class="card-meta">
+          <p class="card-label" style="color:var(--wed)">Exercise 3B — Word chain story</p>
+          <h3 class="card-title">Connect the words</h3>
+          <p class="card-desc">Your teacher gives you 4 vocabulary words in random order. You must tell a short but coherent story that uses all 4, in any order. The story must make logical sense.</p>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="grid2">
+          <div class="mini-card">
+            <p class="mc-top" style="color:var(--wed)">Chain A</p>
+            <p>freeze out · build rapport · speak up · follow up</p>
+            <p class="mc-task" style="color:var(--wed)">Setting suggestion: a new job or collaboration</p>
+          </div>
+          <div class="mini-card">
+            <p class="mc-top" style="color:var(--wed)">Chain B</p>
+            <p>burn out · step up · coping mechanisms · check in with</p>
+            <p class="mc-task" style="color:var(--wed)">Setting suggestion: a very busy season in your business</p>
+          </div>
+          <div class="mini-card">
+            <p class="mc-top" style="color:var(--wed)">Chain C</p>
+            <p>get under your skin · back down · in the same boat · cross the divide</p>
+            <p class="mc-task" style="color:var(--wed)">Setting suggestion: a disagreement with a difficult person</p>
+          </div>
+          <div class="mini-card">
+            <p class="mc-top" style="color:var(--wed)">Chain D</p>
+            <p>put off · point out · carry out · call off</p>
+            <p class="mc-task" style="color:var(--wed)">Setting suggestion: a project that went wrong</p>
+          </div>
+        </div>
+        <div class="example" style="background:#FDF3E3;border-left:3px solid var(--wed)">
+          <p class="example-label" style="color:var(--wed)">Example — Chain A</p>
+          <p>"When I started a new group online, I was completely frozen out at first. Nobody responded to my messages. I decided to speak up in one of the communities and managed to build rapport with two people. I followed up with both of them and now they're regular students."</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ THURSDAY ══════════ -->
+<div class="day-panel" id="panel-thu">
+  <div class="hero">
+    <div class="hero-left">
+      <p class="hero-tag" style="color:var(--thu)">Thursday · Exercise type 4</p>
+      <h2 style="color:var(--thu)">Opinion<br>hot takes</h2>
+      <p class="hero-desc">Strong opinions + workplace vocabulary. Today you practise agreeing, disagreeing, and defending a position — all using the phrases and phrasal verbs from the week.</p>
+    </div>
+    <span class="hero-badge" style="background:var(--thu-l);color:var(--thu)">💬 Argue & defend</span>
+  </div>
+
+  <div class="vocab-strip">
+    <div class="vocab-strip-header" onclick="toggleVocab(this)">
+      <span>Vocabulary + agree/disagree phrases — click to expand</span>
+      <span class="toggle-icon">+</span>
+    </div>
+    <div class="vocab-strip-body">
+      <div class="vocab-item"><p class="vocab-term" style="color:#1D6B3A">Exactly!</p><p class="vocab-def">strong agreement</p></div>
+      <div class="vocab-item"><p class="vocab-term" style="color:#1D6B3A">I feel the same.</p><p class="vocab-def">agree, sharing the feeling</p></div>
+      <div class="vocab-item"><p class="vocab-term" style="color:#1D6B3A">I think so, too.</p><p class="vocab-def">agree with an opinion</p></div>
+      <div class="vocab-item"><p class="vocab-term" style="color:#C0291A">I totally disagree.</p><p class="vocab-def">strong disagreement</p></div>
+      <div class="vocab-item"><p class="vocab-term" style="color:#C0291A">I see it differently.</p><p class="vocab-def">polite disagreement</p></div>
+      <div class="vocab-item"><p class="vocab-term" style="color:#C0291A">I'm not so sure.</p><p class="vocab-def">soft disagreement / doubt</p></div>
+      <div class="vocab-item"><p class="vocab-term" style="color:var(--coral)">get under your skin</p><p class="vocab-def">irritate or upset you</p></div>
+      <div class="vocab-item"><p class="vocab-term" style="color:var(--coral)">build rapport</p><p class="vocab-def">develop trust with someone</p></div>
+      <div class="vocab-item"><p class="vocab-term" style="color:var(--coral)">speak up</p><p class="vocab-def">say what you think</p></div>
+      <div class="vocab-item"><p class="vocab-term" style="color:var(--coral)">back down</p><p class="vocab-def">withdraw from a position</p></div>
+      <div class="vocab-item"><p class="vocab-term" style="color:var(--coral)">step up</p><p class="vocab-def">take more responsibility</p></div>
+      <div class="vocab-item"><p class="vocab-term" style="color:var(--coral)">burn out</p><p class="vocab-def">become exhausted</p></div>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon">🔥</div>
+        <div class="card-meta">
+          <p class="card-label" style="color:var(--thu)">Exercise 4A — Hot takes</p>
+          <h3 class="card-title">Agree, disagree, and explain</h3>
+          <p class="card-desc">For each statement: (1) choose an agree/disagree phrase, (2) say it immediately, (3) give at least two reasons using vocabulary from the week. No pausing before you start.</p>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="item-list">
+          <div class="item" style="border-left:3px solid var(--thu)"><span class="item-n" style="color:var(--thu)">1</span>"Entrepreneurs who can't build rapport with clients will always struggle — no matter how good their product is."</div>
+          <div class="item" style="border-left:3px solid var(--thu)"><span class="item-n" style="color:var(--thu)">2</span>"If a colleague freezes you out, the best thing to do is confront them directly instead of putting off the conversation."</div>
+          <div class="item" style="border-left:3px solid var(--thu)"><span class="item-n" style="color:var(--thu)">3</span>"People who always back down in difficult conversations give off a weak impression professionally."</div>
+          <div class="item" style="border-left:3px solid var(--thu)"><span class="item-n" style="color:var(--thu)">4</span>"You can't really step up in your career if you never speak up in meetings or group situations."</div>
+          <div class="item" style="border-left:3px solid var(--thu)"><span class="item-n" style="color:var(--thu)">5</span>"Freelancers are all in the same boat — there's no way to completely avoid burning out at some point."</div>
+          <div class="item" style="border-left:3px solid var(--thu)"><span class="item-n" style="color:var(--thu)">6</span>"The best coping mechanism for a difficult colleague is to simply get on with your work and ignore them."</div>
+          <div class="item" style="border-left:3px solid var(--thu)"><span class="item-n" style="color:var(--thu)">7</span>"A manager who always points out mistakes but never checks in with the team gives off the wrong energy."</div>
+        </div>
+        <div class="example" style="background:#E6F1FB;border-left:3px solid var(--thu)">
+          <p class="example-label" style="color:var(--thu)">Example response</p>
+          <p><strong>Statement 1</strong> → "I feel the same, actually. As an English teacher and content creator, I've learned that building rapport is everything. If a student doesn't feel comfortable, they put off practising and you can't really carry out effective lessons. The technical knowledge matters, but the connection matters more."</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon">⚖️</div>
+        <div class="card-meta">
+          <p class="card-label" style="color:var(--thu)">Exercise 4B — Devil's advocate</p>
+          <h3 class="card-title">Defend the opposite side</h3>
+          <p class="card-desc">Your teacher picks a side. You must argue the opposite — even if you personally agree with the original. This trains you to use the vocabulary flexibly and think fast. 40 seconds per round.</p>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="grid2">
+          <div class="mini-card">
+            <p class="mc-top" style="color:var(--thu)">Round 1</p>
+            <p>"You should always speak up when something gets under your skin at work."</p>
+            <p class="mc-task" style="color:var(--thu)">Argue: sometimes it's better NOT to speak up</p>
+          </div>
+          <div class="mini-card">
+            <p class="mc-top" style="color:var(--thu)">Round 2</p>
+            <p>"Crossing the divide with a difficult colleague is always worth the effort."</p>
+            <p class="mc-task" style="color:var(--thu)">Argue: sometimes it's not worth it at all</p>
+          </div>
+          <div class="mini-card">
+            <p class="mc-top" style="color:var(--thu)">Round 3</p>
+            <p>"Freelancers should never take on more than 3 clients at a time to avoid burnout."</p>
+            <p class="mc-task" style="color:var(--thu)">Argue: taking on more is actually fine and necessary</p>
+          </div>
+          <div class="mini-card">
+            <p class="mc-top" style="color:var(--thu)">Round 4</p>
+            <p>"Backing down in a negotiation gives off a weak professional image."</p>
+            <p class="mc-task" style="color:var(--thu)">Argue: knowing when to back down is a strength</p>
+          </div>
+        </div>
+        <div class="tip"><span>🎯</span><p>You don't have to believe what you're arguing — that's the point. Use: "I see it differently…" or "I'm not so sure about that…" to open.</p></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ FRIDAY ══════════ -->
+<div class="day-panel" id="panel-fri">
+  <div class="hero">
+    <div class="hero-left">
+      <p class="hero-tag" style="color:var(--fri)">Friday · Exercise type 5</p>
+      <h2 style="color:var(--fri)">Fluency<br>sprint</h2>
+      <p class="hero-desc">End the week with speed and confidence. No preparation, no pausing — just respond. The goal is to speak automatically using everything you learned this week.</p>
+    </div>
+    <span class="hero-badge" style="background:var(--fri-l);color:var(--fri)">⚡ No pause, just speak</span>
+  </div>
+
+  <div class="vocab-strip">
+    <div class="vocab-strip-header" onclick="toggleVocab(this)">
+      <span>Full week vocabulary review — click to expand</span>
+      <span class="toggle-icon">+</span>
+    </div>
+    <div class="vocab-strip-body">
+      <div class="vocab-item"><p class="vocab-term" style="color:var(--coral)">get under your skin</p><p class="vocab-def">irritate you</p></div>
+      <div class="vocab-item"><p class="vocab-term" style="color:var(--coral)">cross the divide</p><p class="vocab-def">build understanding across differences</p></div>
+      <div class="vocab-item"><p class="vocab-term" style="color:var(--coral)">coping mechanisms</p><p class="vocab-def">strategies to manage stress</p></div>
+      <div class="vocab-item"><p class="vocab-term" style="color:var(--coral)">in the same boat</p><p class="vocab-def">same difficult situation</p></div>
+      <div class="vocab-item"><p class="vocab-term" style="color:var(--coral)">build rapport</p><p class="vocab-def">develop trust with someone</p></div>
+      <div class="vocab-item"><p class="vocab-term" style="color:var(--coral)">put off</p><p class="vocab-def">postpone</p></div>
+      <div class="vocab-item"><p class="vocab-term" style="color:var(--coral)">give off</p><p class="vocab-def">emit a vibe or impression</p></div>
+      <div class="vocab-item"><p class="vocab-term" style="color:var(--coral)">freeze out</p><p class="vocab-def">exclude someone</p></div>
+      <div class="vocab-item"><p class="vocab-term" style="color:var(--coral)">point out</p><p class="vocab-def">highlight something</p></div>
+      <div class="vocab-item"><p class="vocab-term" style="color:var(--coral)">take on</p><p class="vocab-def">accept a new challenge</p></div>
+      <div class="vocab-item"><p class="vocab-term" style="color:var(--coral)">carry out</p><p class="vocab-def">execute a task</p></div>
+      <div class="vocab-item"><p class="vocab-term" style="color:var(--coral)">get on with</p><p class="vocab-def">have a good relationship</p></div>
+      <div class="vocab-item"><p class="vocab-term" style="color:var(--coral)">call off</p><p class="vocab-def">cancel</p></div>
+      <div class="vocab-item"><p class="vocab-term" style="color:var(--coral)">stick to</p><p class="vocab-def">follow without changing</p></div>
+      <div class="vocab-item"><p class="vocab-term" style="color:var(--coral)">speak up</p><p class="vocab-def">say what you think</p></div>
+      <div class="vocab-item"><p class="vocab-term" style="color:var(--coral)">step up</p><p class="vocab-def">take more responsibility</p></div>
+      <div class="vocab-item"><p class="vocab-term" style="color:var(--coral)">back down</p><p class="vocab-def">withdraw from a position</p></div>
+      <div class="vocab-item"><p class="vocab-term" style="color:var(--coral)">follow up</p><p class="vocab-def">check on progress</p></div>
+      <div class="vocab-item"><p class="vocab-term" style="color:var(--coral)">burn out</p><p class="vocab-def">become exhausted</p></div>
+      <div class="vocab-item"><p class="vocab-term" style="color:var(--coral)">check in with</p><p class="vocab-def">contact briefly to see how things are</p></div>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon">⚡</div>
+        <div class="card-meta">
+          <p class="card-label" style="color:var(--fri)">Exercise 5A — 30-second sprints</p>
+          <h3 class="card-title">Speak first, think second</h3>
+          <p class="card-desc">Your teacher reads a question. You must start speaking within 2 seconds and talk for 30 seconds minimum. The vocabulary word must appear in your first two sentences — not saved for later.</p>
+        </div>
+      </div>
+      <div class="card-body">
+        <div style="margin-bottom:4px"><span class="timed-pill"><span class="blink"></span>30 seconds · start immediately</span></div>
+        <div class="item-list">
+          <div class="item" style="border-left:3px solid var(--fri)"><span class="item-n" style="color:var(--fri)">1</span>"Tell me about a time you almost burned out. What happened and what coping mechanisms did you use?"</div>
+          <div class="item" style="border-left:3px solid var(--fri)"><span class="item-n" style="color:var(--fri)">2</span>"Has anyone ever frozen you out professionally? Or have you ever frozen someone out — even unintentionally?"</div>
+          <div class="item" style="border-left:3px solid var(--fri)"><span class="item-n" style="color:var(--fri)">3</span>"What's one situation where you really had to step up? Did you stick to the original plan or change your approach?"</div>
+          <div class="item" style="border-left:3px solid var(--fri)"><span class="item-n" style="color:var(--fri)">4</span>"Do you find it easy to speak up when something gets under your skin? Or do you tend to put it off?"</div>
+          <div class="item" style="border-left:3px solid var(--fri)"><span class="item-n" style="color:var(--fri)">5</span>"Describe someone you really get on with professionally. How did you build rapport with them?"</div>
+          <div class="item" style="border-left:3px solid var(--fri)"><span class="item-n" style="color:var(--fri)">6</span>"As an infoproducer or teacher, what's one task you often put off even though you know you should carry it out?"</div>
+          <div class="item" style="border-left:3px solid var(--fri)"><span class="item-n" style="color:var(--fri)">7</span>"Has there been a time you had to cross the divide with a student or client who gave off a difficult energy?"</div>
+        </div>
+        <div class="rule"><p>⚡ Rule: no "hmm", no "well…", no "that's a great question." The first word out of your mouth must be the vocabulary item or an agree/disagree phrase.</p></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon">🏆</div>
+        <div class="card-meta">
+          <p class="card-label" style="color:var(--fri)">Exercise 5B — Weekly recap challenge</p>
+          <h3 class="card-title">Use everything — 2 minutes</h3>
+          <p class="card-desc">The final challenge of the week. Pick one topic below and speak for 2 full minutes. You must use at least 6 different vocabulary items from the week — naturally, not just listed. Your teacher will keep score.</p>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="item-list">
+          <div class="item" style="border-left:3px solid var(--fri)"><span class="item-n" style="color:var(--fri)">A</span>"The biggest professional challenge I've faced as an entrepreneur or teacher — and how I dealt with it."</div>
+          <div class="item" style="border-left:3px solid var(--fri)"><span class="item-n" style="color:var(--fri)">B</span>"My ideal professional relationship — what makes someone easy to work with, and what gets under my skin."</div>
+          <div class="item" style="border-left:3px solid var(--fri)"><span class="item-n" style="color:var(--fri)">C</span>"Advice I would give to someone just starting out as a freelancer in the music or education industry."</div>
+        </div>
+
+        <div style="background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:16px 18px;">
+          <p style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);margin-bottom:10px">Teacher scorecard</p>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px">
+            <div style="background:var(--white);border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-size:12px;color:var(--muted)">☐ get under your skin</div>
+            <div style="background:var(--white);border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-size:12px;color:var(--muted)">☐ build rapport</div>
+            <div style="background:var(--white);border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-size:12px;color:var(--muted)">☐ coping mechanisms</div>
+            <div style="background:var(--white);border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-size:12px;color:var(--muted)">☐ step up / speak up</div>
+            <div style="background:var(--white);border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-size:12px;color:var(--muted)">☐ burn out / put off</div>
+            <div style="background:var(--white);border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-size:12px;color:var(--muted)">☐ take on / carry out</div>
+            <div style="background:var(--white);border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-size:12px;color:var(--muted)">☐ check in / follow up</div>
+            <div style="background:var(--white);border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-size:12px;color:var(--muted)">☐ in the same boat</div>
+          </div>
+          <p style="font-size:12px;color:var(--muted);margin-top:10px">Goal: 6+ items used naturally. 8 = perfect week. 🏆</p>
+        </div>
+        <div class="tip"><span>🌟</span><p>After 2 minutes, your teacher picks one vocabulary word you didn't use — you have 30 extra seconds to fit it into a final thought.</p></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div style="text-align:center;padding:32px 40px 48px;font-size:12px;color:var(--muted)">
+  Based on <span style="color:var(--coral);font-weight:600">ESL Brains</span> — How to work with people who get under your skin &nbsp;·&nbsp; B1/B2 Weekly Practice Series
+</div>
+
+<script>
+  function showDay(day, btn) {
+    document.querySelectorAll('.day-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.day-btn').forEach(b => {
+      b.classList.remove('active-mon','active-tue','active-wed','active-thu','active-fri');
+    });
+    document.getElementById('panel-' + day).classList.add('active');
+    btn.classList.add('active-' + day);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function toggleVocab(header) {
+    const body = header.nextElementSibling;
+    const icon = header.querySelector('.toggle-icon');
+    const isOpen = body.classList.contains('open');
+    body.classList.toggle('open', !isOpen);
+    icon.textContent = isOpen ? '+' : '−';
+  }
+
+  // set Monday active on load
+  document.getElementById('btn-mon').classList.add('active-mon');
+</script>
+</body>
+</html>
